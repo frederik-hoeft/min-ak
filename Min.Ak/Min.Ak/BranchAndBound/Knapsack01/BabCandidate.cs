@@ -46,17 +46,27 @@ internal sealed record BabCandidate(BaB Bab, ImmutableArray<BaBSelection> Select
         }
     }
 
-    public override string ToString()
+    public string GetSelections(bool includeRejected)
     {
         StringBuilder sb = new();
         foreach (BaBSelection selection in Selections)
         {
+            if (!includeRejected && selection.Negate)
+            {
+                continue;
+            }
             if (selection.Negate)
             {
                 sb.Append('!');
             }
             sb.Append(selection.Option.Name);
         }
+        return sb.ToString();
+    }
+
+    public override string ToString()
+    {
+        StringBuilder sb = new(GetSelections(includeRejected: true));
         sb.Append("(Cost: ").Append(PreselectCost).Append(", Gain: ").Append(PreselectGain).Append(", MaxGain: ").Append(MaxGain).Append(')');
         return sb.ToString();
     }
