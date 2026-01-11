@@ -1,10 +1,10 @@
 ﻿namespace Min.Ak.BranchAndBound.Knapsack01;
 
-internal readonly record struct BabSolution
+internal readonly record struct K01BabSolution
 {
-    private readonly BabCandidate _candidate;
+    private readonly K01BabCandidate _candidate;
 
-    public BabSolution(BabCandidate candidate)
+    public K01BabSolution(K01BabCandidate candidate)
     {
         _candidate = candidate;
         Selections = _candidate.GetSelections(includeRejected: false);

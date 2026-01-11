@@ -5,9 +5,9 @@ using System.Text;
 namespace Min.Ak.BranchAndBound.Knapsack01;
 
 [DebuggerDisplay("{ToString(),nq}")]
-internal sealed record BabCandidate(BaB Bab, ImmutableArray<BaBSelection> Selections)
+internal sealed record K01BabCandidate(K01BaB Bab, ImmutableArray<K01BaBSelection> Selections)
 {
-    private static readonly BaBOption s_dummy = new(string.Empty, 0f, 0f);
+    private static readonly K01BaBOption s_dummy = new(string.Empty, 0f, 0f);
 
     public float PostselectGain { get; } = Selections.Sum(selection => selection switch
     {
@@ -15,7 +15,7 @@ internal sealed record BabCandidate(BaB Bab, ImmutableArray<BaBSelection> Select
         _ => 0f,
     });
 
-    public float PreselectGain => PostselectGain - LastOption.Gain;
+    public float PreselectGain => PostselectGain - AddedSelection.Gain;
 
     public float PostselectCost { get; } = Selections.Sum(selection => selection switch
     {
@@ -23,24 +23,24 @@ internal sealed record BabCandidate(BaB Bab, ImmutableArray<BaBSelection> Select
         _ => 0f,
     });
 
-    public float PreselectCost => PostselectCost - LastOption.Cost;
+    public float PreselectCost => PostselectCost - AddedSelection.Cost;
 
-    public BaBOption LastOption => Selections is [.., { } last] ? last.Option : s_dummy;
+    public K01BaBOption AddedSelection => Selections is [.., { } last] ? last.Option : s_dummy;
 
-    public float MaxGain => PreselectGain + (Bab.MaxCost - PreselectCost) * LastOption.RelativeGain;
+    public float MaxGain => PreselectGain + ((Bab.MaxCost - PreselectCost) * AddedSelection.RelativeGain);
 
-    public IEnumerable<BabCandidate> EnumerateChildren()
+    public IEnumerable<K01BabCandidate> EnumerateChildren()
     {
         for (int i = Selections.Length; i < Bab.Options.Length; ++i)
         {
-            BabCandidate childCandidate = new(Bab,
+            K01BabCandidate childCandidate = new(Bab,
             [
                 // everything we've already chosen or rejected
                 .. Selections,
                 // reject all options between current length and i
-                .. Bab.Options[Selections.Length..Math.Max(i, Selections.Length)].Select(notChosen => new BaBSelection(notChosen, Negate: true)),
+                .. Bab.Options[Selections.Length..Math.Max(i, Selections.Length)].Select(notChosen => new K01BaBSelection(notChosen, Negate: true)),
                 // choose option i
-                new BaBSelection(Bab.Options[i], Negate: false)
+                new K01BaBSelection(Bab.Options[i], Negate: false)
             ]);
             yield return childCandidate;
         }
@@ -49,7 +49,7 @@ internal sealed record BabCandidate(BaB Bab, ImmutableArray<BaBSelection> Select
     public string GetSelections(bool includeRejected)
     {
         StringBuilder sb = new();
-        foreach (BaBSelection selection in Selections)
+        foreach (K01BaBSelection selection in Selections)
         {
             if (!includeRejected && selection.Negate)
             {
@@ -71,5 +71,5 @@ internal sealed record BabCandidate(BaB Bab, ImmutableArray<BaBSelection> Select
         return sb.ToString();
     }
 
-    public BabSolution ToSolution() => new(this);
+    public K01BabSolution ToSolution() => new(this);
 }

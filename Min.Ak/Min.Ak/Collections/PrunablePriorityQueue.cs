@@ -2,10 +2,10 @@
 using System.Numerics;
 using System.Text;
 
-namespace Min.Ak.BranchAndBound.Knapsack01;
+namespace Min.Ak.Collections;
 
 [DebuggerDisplay("{ToString(),nq}")]
-internal sealed class OrderedDescList<TValue, TPriority>(Func<TValue, TPriority> prioritySelector) where TPriority : unmanaged, INumber<TPriority>
+internal sealed class PrunablePriorityQueue<TValue, TPriority>(SortOrder order, Func<TValue, TPriority> prioritySelector) where TPriority : unmanaged, INumber<TPriority>
 {
     private readonly List<Node> _nodes = [];
 
@@ -28,7 +28,7 @@ internal sealed class OrderedDescList<TValue, TPriority>(Func<TValue, TPriority>
         return value;
     }
 
-    public void PruneBelow(TPriority priority)
+    public void PruneWorseThan(TPriority priority)
     {
         for (int index = SearchIndex(priority); index < _nodes.Count;)
         {
@@ -41,6 +41,9 @@ internal sealed class OrderedDescList<TValue, TPriority>(Func<TValue, TPriority>
     /// </summary>
     private int SearchIndex(TPriority priority)
     {
+        // binary search on a list is fine here, since it's not a linked list, but a growable array.
+        // so indexing is O(1), and shifting elements on insert is O(n) anyway.
+
         int lower = 0;
         int upper = _nodes.Count; // exclusive
 
@@ -49,9 +52,9 @@ internal sealed class OrderedDescList<TValue, TPriority>(Func<TValue, TPriority>
             int pivot = lower + ((upper - lower) / 2);
             TPriority pivotPriority = _nodes[pivot].Priority;
 
-            // Descending: higher priorities come first.
+            // Descending: higher priorities (may be numerically lower depending on order) come first.
             // If our priority is greater, we must go left (smaller index).
-            if (priority > pivotPriority)
+            if (HasHigherPriority(priority, pivotPriority))
             {
                 upper = pivot;
             }
@@ -64,6 +67,13 @@ internal sealed class OrderedDescList<TValue, TPriority>(Func<TValue, TPriority>
 
         return lower;
     }
+
+    private bool HasHigherPriority(TPriority p1, TPriority p2) => order switch
+    {
+        SortOrder.Minimum => p1 < p2,
+        SortOrder.Maximum => p1 > p2,
+        _ => throw new InvalidOperationException("Unsupported sort order."),
+    };
 
     public override string ToString()
     {

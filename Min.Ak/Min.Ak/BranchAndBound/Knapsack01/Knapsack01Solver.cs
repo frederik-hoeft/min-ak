@@ -2,9 +2,9 @@
 
 internal static class Knapsack01Solver
 {
-    public static BabSolution? Solve(float maxCost, List<BaBOption> options)
+    public static K01BabSolution? Solve(float maxCost, List<K01BaBOption> options)
     {
-        BaB bab = new(maxCost, options);
+        K01BaB bab = new(maxCost, options);
         return bab.Solve();
     }
 }
