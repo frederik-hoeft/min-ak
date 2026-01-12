@@ -1,10 +1,12 @@
-﻿namespace Min.Ak.BranchAndBound.Knapsack01;
+﻿using System.Numerics;
 
-internal readonly record struct K01BabSolution
+namespace Min.Ak.BranchAndBound.Knapsack01;
+
+internal readonly record struct K01BabSolution<T> where T : unmanaged, INumber<T>
 {
-    private readonly K01BabCandidate _candidate;
+    private readonly K01BabCandidate<T> _candidate;
 
-    public K01BabSolution(K01BabCandidate candidate)
+    public K01BabSolution(K01BabCandidate<T> candidate)
     {
         _candidate = candidate;
         Selections = _candidate.GetSelections(includeRejected: false);
@@ -12,7 +14,7 @@ internal readonly record struct K01BabSolution
 
     public string Selections { get; }
 
-    public float TotalCost => _candidate.PostselectCost;
+    public T TotalCost => _candidate.PostselectCost;
 
-    public float TotalGain => _candidate.PostselectGain;
+    public T TotalGain => _candidate.PostselectGain;
 }

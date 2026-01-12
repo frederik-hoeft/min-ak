@@ -1,10 +1,13 @@
-﻿namespace Min.Ak.BranchAndBound.Knapsack01;
+﻿using Min.Ak.Model.K01;
+using System.Numerics;
+
+namespace Min.Ak.BranchAndBound.Knapsack01;
 
 internal static class K01BabSolver
 {
-    public static K01BabSolution? Solve(float maxCost, List<K01BaBOption> options)
+    public static K01BabSolution<T>? Solve<T>(T maxCost, IReadOnlyList<Knapsack01Option<T>> options) where T : unmanaged, INumber<T>
     {
-        K01BaB bab = new(maxCost, options);
+        K01BaB<T> bab = new(maxCost, options);
         return bab.Solve();
     }
 }

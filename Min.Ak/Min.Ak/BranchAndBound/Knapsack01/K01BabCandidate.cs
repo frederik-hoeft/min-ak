@@ -1,46 +1,48 @@
-﻿using System.Collections.Immutable;
+﻿using Min.Ak.Model.K01;
+using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Numerics;
 using System.Text;
 
 namespace Min.Ak.BranchAndBound.Knapsack01;
 
 [DebuggerDisplay("{ToString(),nq}")]
-internal sealed record K01BabCandidate(K01BaB Bab, ImmutableArray<K01BaBSelection> Selections)
+internal sealed record K01BabCandidate<T>(K01BaB<T> Bab, ImmutableArray<K01BaBSelection<T>> Selections) where T : unmanaged, INumber<T>
 {
-    private static readonly K01BaBOption s_dummy = new(string.Empty, 0f, 0f);
+    private static readonly Knapsack01Option<T> s_dummy = new(string.Empty, T.Zero, T.Zero);
 
-    public float PostselectGain { get; } = Selections.Sum(selection => selection switch
+    public T PostselectGain { get; } = Selections.Aggregate(T.Zero, (sum, selection) => sum + selection switch
     {
         { Negate: false } => selection.Option.Gain,
-        _ => 0f,
+        _ => T.Zero,
     });
 
-    public float PreselectGain => PostselectGain - AddedSelection.Gain;
+    public T PreselectGain => PostselectGain - AddedSelection.Gain;
 
-    public float PostselectCost { get; } = Selections.Sum(selection => selection switch
+    public T PostselectCost { get; } = Selections.Aggregate(T.Zero, (sum, selection) => sum + selection switch
     {
         { Negate: false } => selection.Option.Cost,
-        _ => 0f,
+        _ => T.Zero,
     });
 
-    public float PreselectCost => PostselectCost - AddedSelection.Cost;
+    public T PreselectCost => PostselectCost - AddedSelection.Cost;
 
-    public K01BaBOption AddedSelection => Selections is [.., { } last] ? last.Option : s_dummy;
+    public Knapsack01Option<T> AddedSelection => Selections is [.., { } last] ? last.Option : s_dummy;
 
-    public float MaxGain => PreselectGain + ((Bab.MaxCost - PreselectCost) * AddedSelection.RelativeGain);
+    public T MaxGain => PreselectGain + ((Bab.MaxCost - PreselectCost) * AddedSelection.RelativeGain);
 
-    public IEnumerable<K01BabCandidate> EnumerateChildren()
+    public IEnumerable<K01BabCandidate<T>> EnumerateChildren()
     {
         for (int i = Selections.Length; i < Bab.Options.Length; ++i)
         {
-            K01BabCandidate childCandidate = new(Bab,
+            K01BabCandidate<T> childCandidate = new(Bab,
             [
                 // everything we've already chosen or rejected
                 .. Selections,
                 // reject all options between current length and i
-                .. Bab.Options[Selections.Length..Math.Max(i, Selections.Length)].Select(notChosen => new K01BaBSelection(notChosen, Negate: true)),
+                .. Bab.Options[Selections.Length..Math.Max(i, Selections.Length)].Select(notChosen => new K01BaBSelection<T>(notChosen, Negate: true)),
                 // choose option i
-                new K01BaBSelection(Bab.Options[i], Negate: false)
+                new K01BaBSelection<T>(Bab.Options[i], Negate: false)
             ]);
             yield return childCandidate;
         }
@@ -49,7 +51,7 @@ internal sealed record K01BabCandidate(K01BaB Bab, ImmutableArray<K01BaBSelectio
     public string GetSelections(bool includeRejected)
     {
         StringBuilder sb = new();
-        foreach (K01BaBSelection selection in Selections)
+        foreach (K01BaBSelection<T> selection in Selections)
         {
             if (!includeRejected && selection.Negate)
             {
@@ -71,5 +73,5 @@ internal sealed record K01BabCandidate(K01BaB Bab, ImmutableArray<K01BaBSelectio
         return sb.ToString();
     }
 
-    public K01BabSolution ToSolution() => new(this);
+    public K01BabSolution<T> ToSolution() => new(this);
 }
