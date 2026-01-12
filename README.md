@@ -5,47 +5,47 @@ A compact, educational collection of algorithm implementations written in C#/.NE
 ## Project Overview
 
 - Target Framework: .NET 10 (net10.0)
-- Output: Console app (Program prints "Hello World!" by default)
-- Style: Minimal, internal classes inside namespaces per topic
+- Output: Console app (demo-driven `Program.cs`)
+- Style: Minimal, internal types grouped by topic
 
-See the entry point in [Min.Ak/Min.Ak/Program.cs](Min.Ak/Min.Ak/Program.cs) and project file in [Min.Ak/Min.Ak/Min.Ak.csproj](Min.Ak/Min.Ak/Min.Ak.csproj).
+Entry point in [Min.Ak/Min.Ak/Program.cs](Min.Ak/Min.Ak/Program.cs). Project file at [Min.Ak/Min.Ak/Min.Ak.csproj](Min.Ak/Min.Ak/Min.Ak.csproj).
 
-## Repository Structure
+## Repository Structure (simplified)
 
-- Backtracking
-	- K-Queens: [Min.Ak/Min.Ak/Backtracking/KQueens](Min.Ak/Min.Ak/Backtracking/KQueens)
-		- Core solver: [KQueens.cs](Min.Ak/Min.Ak/Backtracking/KQueens/KQueens.cs)
-		- Board/model: [KQueensBoard.cs](Min.Ak/Min.Ak/Backtracking/KQueens/KQueensBoard.cs)
-		- Solution snapshot: [KQueensSolution.cs](Min.Ak/Min.Ak/Backtracking/KQueens/KQueensSolution.cs)
-- Branch and Bound
-	- 0/1 Knapsack: [Min.Ak/Min.Ak/BranchAndBound/Knapsack01](Min.Ak/Min.Ak/BranchAndBound/Knapsack01)
-		- API surface: [Knapsack01Solver.cs](Min.Ak/Min.Ak/BranchAndBound/Knapsack01/Knapsack01Solver.cs)
-		- Option model: [BaBOption.cs](Min.Ak/Min.Ak/BranchAndBound/Knapsack01/BaBOption.cs)
-		- Algorithm internals: [BaB.cs](Min.Ak/Min.Ak/BranchAndBound/Knapsack01/BaB.cs), [BabCandidate.cs](Min.Ak/Min.Ak/BranchAndBound/Knapsack01/BabCandidate.cs), [BaBSelection.cs](Min.Ak/Min.Ak/BranchAndBound/Knapsack01/BaBSelection.cs), [BabSolution.cs](Min.Ak/Min.Ak/BranchAndBound/Knapsack01/BabSolution.cs), [OrderedDescList.cs](Min.Ak/Min.Ak/BranchAndBound/Knapsack01/OrderedDescList.cs)
-- Computability
-	- Ackermann Function: [Min.Ak/Min.Ak/Computability/Ackermann](Min.Ak/Min.Ak/Computability/Ackermann)
-		- Recursive: [RecursiveAck.cs](Min.Ak/Min.Ak/Computability/Ackermann/RecursiveAck.cs)
-		- Iterative (stack simulation): [IterativeAck.cs](Min.Ak/Min.Ak/Computability/Ackermann/IterativeAck.cs)
+- Solution: [Min.Ak/Min.Ak.slnx](Min.Ak/Min.Ak.slnx)
+- Project: [Min.Ak/Min.Ak/Min.Ak.csproj](Min.Ak/Min.Ak/Min.Ak.csproj)
+- Source (by topic): [Min.Ak/Min.Ak](Min.Ak/Min.Ak)
+	- Backtracking: [Backtracking/KQueens](Min.Ak/Min.Ak/Backtracking/KQueens)
+	- Branch and Bound: [BranchAndBound/Knapsack01](Min.Ak/Min.Ak/BranchAndBound/Knapsack01), [BranchAndBound/Tsp](Min.Ak/Min.Ak/BranchAndBound/Tsp)
+	- Computability: [Computability/Ackermann](Min.Ak/Min.Ak/Computability/Ackermann)
+	- Utilities: [Collections](Min.Ak/Min.Ak/Collections), [Model/Tsp](Min.Ak/Min.Ak/Model/Tsp)
+- Publishing: [Min.Ak/Min.Ak/Properties/PublishProfiles](Min.Ak/Min.Ak/Properties/PublishProfiles)
+- Build outputs (local): [Min.Ak/Min.Ak/artifacts](Min.Ak/Min.Ak/artifacts)
 
 ## Algorithms Implemented
 
 - K-Queens (Backtracking)
 	- Goal: Place K queens on an N×N board so none attack each other.
-	- Method: Backtracking with incremental constraints across rows, columns, and diagonals.
-	- Entry type: Min.Ak.Backtracking.KQueens.KQueens (internal sealed record with Solve() returning a list of solutions).
+	- Method: Backtracking with row/column/diagonal constraints.
+	- Types: `Min.Ak.Backtracking.KQueens.KQueens` with `Solve()` returning `List<KQueensSolution>`.
 
 - 0/1 Knapsack (Branch and Bound)
-	- Goal: Maximize total gain without exceeding a cost (capacity) constraint.
-	- Method: Branch and Bound with item ordering by relative gain.
-	- Entry API: Min.Ak.BranchAndBound.Knapsack01.Knapsack01Solver.Solve(maxCost, options) where options is a list of BaBOption(Name, Gain, Cost).
+	- Goal: Maximize total gain subject to a cost limit.
+	- Method: Branch-and-Bound with item ordering by relative gain.
+	- API: `Min.Ak.BranchAndBound.Knapsack01.Knapsack01Solver.Solve(maxCost, options)` where `options` is `List<K01BaBOption>`.
+
+- Traveling Salesman Problem (Branch and Bound)
+	- Goal: Compute tours minimizing total distance on a complete graph.
+	- Method: Branch-and-Bound with matrix reductions and pruning.
+	- API: `Min.Ak.BranchAndBound.Tsp.TspSolver.Solve(names, distanceMatrix)` using `Min.Ak.Model.Tsp.DistanceMatrix<T>`.
 
 - Ackermann Function (Computability)
-	- Goal: Compare recursive vs iterative (stack-based) implementations of the Ackermann function.
-	- Types: RecursiveAck.Ack(n, m) and IterativeAck.Ack(n, m) under Min.Ak.Computability.Ackermann.
+	- Goal: Compare recursive vs iterative (stack-based) implementations.
+	- Types: `RecursiveAck.Ack(n, m)` and `IterativeAck.Ack(n, m)` under `Min.Ak.Computability.Ackermann`.
 
 ## Build & Run
 
-Prerequisites: .NET 10 SDK (or latest preview) to target net10.0.
+Prerequisite: .NET 10 SDK (net10.0).
 
 Basic commands:
 
@@ -54,7 +54,7 @@ dotnet build Min.Ak/Min.Ak/Min.Ak.csproj
 dotnet run --project Min.Ak/Min.Ak/Min.Ak.csproj
 ```
 
-The default Program.cs just writes "Hello World!". To experiment, add calls to the algorithms in Program.cs.
+Edit [Min.Ak/Min.Ak/Program.cs](Min.Ak/Min.Ak/Program.cs) to switch between demos.
 
 ## Quick Usage Examples
 
@@ -77,18 +77,39 @@ foreach (KQueensSolution solution in solutions)
 ```csharp
 using Min.Ak.BranchAndBound.Knapsack01;
 
-BabSolution? result = Knapsack01Solver.Solve(maxCost: 600, options:
+K01BabSolution? result = Knapsack01Solver.Solve(maxCost: 600, options:
 [
-    BaB.Option("A", gain: 201, cost: 191),
-    BaB.Option("B", gain: 141, cost: 239),
-    BaB.Option("C", gain: 48, cost: 148),
-    BaB.Option("D", gain: 232, cost: 153),
-    BaB.Option("E", gain: 50, cost: 66),
-    BaB.Option("F", gain: 79, cost: 137),
-    BaB.Option("G", gain: 38, cost: 249),
-    BaB.Option("H", gain: 73, cost: 54),
+    K01BaB.Option("A", gain: 201, cost: 191),
+    K01BaB.Option("B", gain: 141, cost: 239),
+    K01BaB.Option("C", gain:  48, cost: 148),
+    K01BaB.Option("D", gain: 232, cost: 153),
+    K01BaB.Option("E", gain:  50, cost:  66),
+    K01BaB.Option("F", gain:  79, cost: 137),
+    K01BaB.Option("G", gain:  38, cost: 249),
+    K01BaB.Option("H", gain:  73, cost:  54),
 ]);
 Console.WriteLine(result?.ToString() ?? "No solution found.");
+```
+
+TSP (Branch and Bound):
+
+```csharp
+using Min.Ak.BranchAndBound.Tsp;
+using Min.Ak.Model.Tsp;
+
+List<TspBabSolution<int>> results = TspSolver.Solve
+(
+    ["A", "B", "C", "D", "E"],
+    DistanceMatrix.Create(
+    [
+        [-1,  6, 15, 15,  8],
+        [ 7, -1,  9, 11,  5],
+        [15, 11, -1,  5, 18],
+        [16, 12,  7, -1, 17],
+        [ 6,  9, 20, 14, -1]
+    ], infinityValue: -1)
+);
+Console.WriteLine(results.Count == 0 ? "No solution found." : string.Join('\n', results));
 ```
 
 Ackermann (recursive vs iterative):
@@ -102,8 +123,8 @@ Console.WriteLine(IterativeAck.Ack(2, 3));
 
 ## Notes
 
-- The code favors clarity over UI or I/O — adjust Program.cs to run specific demos.
-- AOT publishing is enabled in the project file; you can try native publishing (SDK and platform permitting):
+- The code favors clarity over UI or I/O — adjust `Program.cs` to run specific demos.
+- AOT publishing is enabled; try native publishing (SDK and platform permitting):
 
 ```bash
 dotnet publish Min.Ak/Min.Ak/Min.Ak.csproj -c Release -r win-x64
