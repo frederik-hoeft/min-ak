@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using Min.Ak.Greedy.GraphColoring;
+using System.Numerics;
 using System.Text;
 
 namespace Min.Ak.Model.Tsp;
@@ -21,6 +22,23 @@ internal static class DistanceMatrix
 
     public static DistanceMatrix<T> Create<T>(T[][] data, T infinityValue) where T : unmanaged, INumber<T>
     {
+        DistanceMatrix<T> matrix = CreateUnchecked(data, infinityValue);
+        for (int i = 0; i < matrix.Size; ++i)
+        {
+            T diagonalValue = matrix[i,i];
+            if (diagonalValue != T.Zero && diagonalValue != infinityValue)
+            {
+                throw new ArgumentException("Diagonal elements must be zero or infinity.", nameof(data));
+            }
+        }
+        return matrix;
+    }
+
+    public static DistanceMatrix<T> Create<T>(T[][] data) where T : unmanaged, IFloatingPointIeee754<T> =>
+        Create(data, T.PositiveInfinity);
+
+    public static DistanceMatrix<T> CreateUnchecked<T>(T[][] data, T infinityValue) where T : unmanaged, INumber<T>
+    {
         ArgumentNullException.ThrowIfNull(data, nameof(data));
         ArgumentOutOfRangeException.ThrowIfLessThan(data.Length, 1, nameof(data));
         // ensure square matrix
@@ -32,19 +50,9 @@ internal static class DistanceMatrix
                 throw new ArgumentException("Input data must be a square matrix.", nameof(data));
             }
         }
-        for (int i = 0; i < size; ++i)
-        {
-            T diagonalValue = data[i][i];
-            if (diagonalValue != T.Zero && diagonalValue != infinityValue)
-            {
-                throw new ArgumentException("Diagonal elements must be zero or infinity.", nameof(data));
-            }
-        }
+        // not checking the values
         return new DistanceMatrix<T>(data, infinityValue);
     }
-
-    public static DistanceMatrix<T> Create<T>(T[][] data) where T : unmanaged, IFloatingPointIeee754<T> =>
-        Create(data, T.PositiveInfinity);
 }
 
 internal readonly struct DistanceMatrix<T>(T[][] matrix, T infinityValue) where T : unmanaged, INumber<T>
