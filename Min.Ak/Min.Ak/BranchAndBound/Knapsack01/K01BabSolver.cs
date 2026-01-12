@@ -1,6 +1,6 @@
 ﻿namespace Min.Ak.BranchAndBound.Knapsack01;
 
-internal static class Knapsack01Solver
+internal static class K01BabSolver
 {
     public static K01BabSolution? Solve(float maxCost, List<K01BaBOption> options)
     {

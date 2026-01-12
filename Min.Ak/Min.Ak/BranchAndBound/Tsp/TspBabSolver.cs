@@ -5,7 +5,7 @@ using System.Numerics;
 
 namespace Min.Ak.BranchAndBound.Tsp;
 
-internal static class TspSolver
+internal static class TspBabSolver
 {
     public static List<TspBabSolution<T>> Solve<T>(ImmutableArray<string> names, DistanceMatrix<T> distanceMatrix) where T : unmanaged, INumber<T>
     {
