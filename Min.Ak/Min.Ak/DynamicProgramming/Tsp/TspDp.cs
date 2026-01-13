@@ -1,4 +1,5 @@
 ﻿using Min.Ak.Collections;
+using Min.Ak.Model;
 using Min.Ak.Model.Tsp;
 using System.Diagnostics;
 using System.Numerics;
@@ -11,12 +12,12 @@ internal sealed record TspDp<T>(DistanceMatrix<T> DistanceMatrix, OrderedBijecti
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(NameIndexMap.Count, 2);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(NameIndexMap.Count, 30);
-        Dictionary<TspDpIndexSet, DpCell[]> dpTable = new(capacity: 1 << NameIndexMap.Count);
+        Dictionary<GraphIndexSet, DpCell[]> dpTable = new(capacity: 1 << NameIndexMap.Count);
 
-        Queue<TspDpIndexSet> queue = new();
-        TspDpIndexSet root = TspDpIndexSet.Empty;
+        Queue<GraphIndexSet> queue = new();
+        GraphIndexSet root = GraphIndexSet.Empty;
         queue.Enqueue(root);
-        while (queue.TryDequeue(out TspDpIndexSet set))
+        while (queue.TryDequeue(out GraphIndexSet set))
         {
             if (dpTable.ContainsKey(set))
             {
@@ -34,7 +35,7 @@ internal sealed record TspDp<T>(DistanceMatrix<T> DistanceMatrix, OrderedBijecti
             dpTable[set] = row;
         }
         int currentIndex = 0;
-        TspDpIndexSet indexSet = TspDpIndexSet.Full(NameIndexMap.Count);
+        GraphIndexSet indexSet = GraphIndexSet.Full(NameIndexMap.Count);
         // we are starting from index 0, so we can just use that (distance to itself is 0)
         // d(1,1) + DP[1,{2,3,4}]
         DpCell final = dpTable[indexSet.Remove(currentIndex)][currentIndex];
@@ -49,7 +50,7 @@ internal sealed record TspDp<T>(DistanceMatrix<T> DistanceMatrix, OrderedBijecti
         return new TspDpSolution<T>(this, final.MinCost, path);
     }
 
-    private DpCell Route(int i, TspDpIndexSet set, Dictionary<TspDpIndexSet, DpCell[]> dpTable)
+    private DpCell Route(int i, GraphIndexSet set, Dictionary<GraphIndexSet, DpCell[]> dpTable)
     {
         if (set.IsEmpty)
         {
