@@ -26,13 +26,7 @@ internal sealed record KruskalSolution<T>(Kruskal<T> Kruskal, IReadOnlyList<Krus
         for (int i = 0; i < SelectedEdges.Count; i++)
         {
             Kruskal<T>.Edge edge = SelectedEdges[i];
-            sb.Append('(')
-              .Append(Kruskal.NameIndexMap.GetByValue(edge.U))
-              .Append(" -- ")
-              .Append(Kruskal.NameIndexMap.GetByValue(edge.V))
-              .Append(" : ")
-              .Append(edge.Weight)
-              .Append(')');
+            sb.Append(edge);
             if (i < SelectedEdges.Count - 1)
             {
                 sb.Append(", ");
