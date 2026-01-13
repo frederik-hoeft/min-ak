@@ -1,8 +1,7 @@
-﻿using Min.Ak.Greedy.GraphColoring;
-using System.Numerics;
+﻿using System.Numerics;
 using System.Text;
 
-namespace Min.Ak.Model.Tsp;
+namespace Min.Ak.Model.GraphTheory;
 
 internal static class DistanceMatrix
 {

@@ -17,7 +17,7 @@ The source code is organized by algorithmic technique:
 - **[Backtracking](Min.Ak/Min.Ak/Backtracking)** — K-Queens problem
 - **[BranchAndBound](Min.Ak/Min.Ak/BranchAndBound)** — 0/1 Knapsack, TSP
 - **[DynamicProgramming](Min.Ak/Min.Ak/DynamicProgramming)** — N-Knapsack, TSP
-- **[Greedy](Min.Ak/Min.Ak/Greedy)** — Graph Coloring, 0/1 Knapsack, Fractional Knapsack
+- **[Greedy](Min.Ak/Min.Ak/Greedy)** — A*, Dijkstra, Graph Coloring, Kruskal MST, 0/1 Knapsack, Fractional Knapsack
 - **[Computability](Min.Ak/Min.Ak/Computability)** — Ackermann function
 - **[Collections](Min.Ak/Min.Ak/Collections)** — Custom data structures
 - **[Model](Min.Ak/Min.Ak/Model)** — Shared problem models
@@ -39,7 +39,7 @@ Solution file: [Min.Ak.slnx](Min.Ak/Min.Ak.slnx) · Project: [Min.Ak.csproj](Min
 - Traveling Salesman Problem (Branch and Bound)
 	- Goal: Compute tours minimizing total distance on a complete graph.
 	- Method: Branch-and-Bound with matrix reductions and pruning.
-	- API: `Min.Ak.BranchAndBound.Tsp.TspBabSolver.Solve(names, distanceMatrix)` where `names` is `ImmutableArray<string>` and using `Min.Ak.Model.Tsp.DistanceMatrix<T>`.
+	- API: `Min.Ak.BranchAndBound.Tsp.TspBabSolver.Solve(names, distanceMatrix)` where `names` is `ImmutableArray<string>` and using `Min.Ak.Model.GraphTheory.DistanceMatrix<T>`.
 
 - Ackermann Function (Computability)
 	- Goal: Compare recursive vs iterative (stack-based) implementations.
@@ -69,6 +69,21 @@ Solution file: [Min.Ak.slnx](Min.Ak/Min.Ak.slnx) · Project: [Min.Ak.csproj](Min
 	- Goal: Color graph nodes such that no adjacent nodes share a color.
 	- Method: Greedy sequential coloring.
 	- API: `Min.Ak.Greedy.GraphColoring.GCGreedySolver.Solve(nodes, adjacencyList)`.
+
+- Dijkstra's Shortest Path (Greedy)
+	- Goal: Find shortest path between two nodes in a weighted graph.
+	- Method: Greedy algorithm using priority queue with edge relaxation.
+	- API: `Min.Ak.Greedy.Dijkstra.DijkstraSolver.Solve(names, distanceMatrix, start, target)`.
+
+- A* Pathfinding (Greedy)
+	- Goal: Find shortest path using both distance and heuristic estimates.
+	- Method: Best-first search with heuristic guidance.
+	- API: `Min.Ak.Greedy.AStar.AStarSolver.Solve(names, distanceMatrix, start, target, heuristic)`.
+
+- Kruskal's Minimum Spanning Tree (Greedy)
+	- Goal: Find minimum spanning tree of a weighted undirected graph.
+	- Method: Sort edges by weight and add non-cyclic edges to the tree.
+	- API: `Min.Ak.Greedy.Kruskal.KruskalSolver.Solve(names, distanceMatrix)`.
 
 ## Build & Run
 
@@ -123,7 +138,7 @@ TSP (Branch and Bound):
 
 ```csharp
 using Min.Ak.BranchAndBound.Tsp;
-using Min.Ak.Model.Tsp;
+using Min.Ak.Model.GraphTheory;
 
 List<TspBabSolution<int>> results = TspBabSolver.Solve
 (
@@ -138,6 +153,68 @@ List<TspBabSolution<int>> results = TspBabSolver.Solve
     ], infinityValue: -1)
 );
 Console.WriteLine(results.Count == 0 ? "No solution found." : string.Join('\n', results));
+```
+
+Dijkstra's Shortest Path:
+
+```csharp
+using Min.Ak.Greedy.Dijkstra;
+using Min.Ak.Model.GraphTheory;
+
+DijkstraSolution<int>? result = DijkstraSolver.Solve(
+    names: ["A", "B", "C", "D"],
+    distanceMatrix: DistanceMatrix.Create(
+    [
+        [int.MaxValue, 1, 4, int.MaxValue],
+        [1, int.MaxValue, 2, 5],
+        [4, 2, int.MaxValue, 1],
+        [int.MaxValue, 5, 1, int.MaxValue]
+    ], infinityValue: int.MaxValue),
+    start: "A",
+    target: "D"
+);
+Console.WriteLine(result?.ToString() ?? "No path found.");
+```
+
+A* Pathfinding:
+
+```csharp
+using Min.Ak.Greedy.AStar;
+using Min.Ak.Model.GraphTheory;
+
+AStarSolution<int>? result = AStarSolver.Solve(
+    names: ["A", "B", "C", "D"],
+    distanceMatrix: DistanceMatrix.Create(
+    [
+        [int.MaxValue, 1, 4, int.MaxValue],
+        [1, int.MaxValue, 2, 5],
+        [4, 2, int.MaxValue, 1],
+        [int.MaxValue, 5, 1, int.MaxValue]
+    ], infinityValue: int.MaxValue),
+    start: "A",
+    target: "D",
+    heuristic: (from, to) => ... // define heuristic function here, must be consistent
+);
+Console.WriteLine(result?.ToString() ?? "No path found.");
+```
+
+Kruskal's Minimum Spanning Tree:
+
+```csharp
+using Min.Ak.Greedy.Kruskal;
+using Min.Ak.Model.GraphTheory;
+
+KruskalSolution<int>? result = KruskalSolver.Solve(
+    ["A", "B", "C", "D"],
+    DistanceMatrix.Create(
+    [
+        [-1, 1, 3, -1],
+        [1, -1, 2, 4],
+        [3, 2, -1, 1],
+        [-1, 4, 1, -1]
+    ], infinityValue: -1)
+);
+Console.WriteLine(result?.ToString() ?? "No spanning tree found.");
 ```
 
 Ackermann (recursive vs iterative):

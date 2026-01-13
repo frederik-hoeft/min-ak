@@ -1,6 +1,4 @@
-﻿using Min.Ak.Collections;
-using Min.Ak.Model.Tsp;
-using System.Numerics;
+﻿using System.Numerics;
 using System.Text;
 
 namespace Min.Ak.DynamicProgramming.Tsp;

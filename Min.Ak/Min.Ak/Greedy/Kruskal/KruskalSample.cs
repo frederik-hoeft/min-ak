@@ -1,4 +1,4 @@
-﻿using Min.Ak.Model.Tsp;
+﻿using Min.Ak.Model.GraphTheory;
 
 namespace Min.Ak.Greedy.Kruskal;
 

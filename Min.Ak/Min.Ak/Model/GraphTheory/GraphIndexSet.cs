@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using System.Text;
 
-namespace Min.Ak.Model;
+namespace Min.Ak.Model.GraphTheory;
 
 [DebuggerDisplay("{ToString(),nq}")]
 internal readonly struct GraphIndexSet(ulong bitMap) : IEquatable<GraphIndexSet>
@@ -106,6 +106,7 @@ internal readonly struct GraphIndexSet(ulong bitMap) : IEquatable<GraphIndexSet>
             return bitMap != 0uL;
         }
 
+        [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Enumerator compiler pattern")]
         public readonly void Dispose() { }
 
         public readonly void Reset() => throw new NotSupportedException();

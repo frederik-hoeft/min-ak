@@ -1,5 +1,5 @@
 ﻿using Min.Ak.Collections;
-using Min.Ak.Model.Tsp;
+using Min.Ak.Model.GraphTheory;
 using System.Numerics;
 
 namespace Min.Ak.Greedy.Kruskal;
