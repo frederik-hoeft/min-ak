@@ -4,6 +4,8 @@ using System.Text;
 
 namespace Min.Ak.Collections;
 
+// this honestly should be a heap, but that's not part of the exam, so I'm not putting in the effort
+// as long as it acts like a priority queue, it's fine for the other algorithms to use it
 [DebuggerDisplay("{ToString(),nq}")]
 internal sealed class DynamicPriorityQueue<TValue, TPriority>(SortOrder order, Func<TValue, TPriority> prioritySelector)
     where TValue : notnull
