@@ -167,6 +167,34 @@ internal readonly struct DistanceMatrix<T>(T[][] matrix, T infinityValue) where 
 
     public void ColumnSubtract(int column, T value) => ColumnAdd(column, -value);
 
+    public bool IsSymmetric()
+    {
+        int n = Size;
+        for (int row = 0; row < n; ++row)
+        {
+            for (int col = row + 1; col < n; ++col)
+            {
+                if (matrix[row][col] != matrix[col][row])
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public IEnumerable<int> Neighbors(int fromIndex)
+    {
+        T[] matrixRow = matrix[fromIndex];
+        for (int toIndex = 0; toIndex < matrixRow.Length; ++toIndex)
+        {
+            if (matrixRow[toIndex] != infinityValue)
+            {
+                yield return toIndex;
+            }
+        }
+    }
+
     public override string ToString()
     {
         StringBuilder sb = new();

@@ -8,7 +8,7 @@ internal sealed record TspBab<T>(DistanceMatrix<T> DistanceMatrix, OrderedBiject
 {
     public List<TspBabSolution<T>> Solve()
     {
-        PrunablePriorityQueue<TspBabCandidate<T>, T> candidates = new(SortOrder.Minimum, static c => c.LowerBound);
+        DynamicPriorityQueue<TspBabCandidate<T>, T> candidates = new(SortOrder.Minimum, static c => c.LowerBound);
         string startingName = NameIndexMap.GetByValue(0);
         OrderedBijectiveMap<string, int> startingVisited = new(capacity: 1);
         startingVisited.Add(startingName, 0);

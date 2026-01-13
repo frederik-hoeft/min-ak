@@ -15,7 +15,7 @@ internal sealed class K01BaB<T>(T maxCost, IReadOnlyList<Knapsack01Option<T>> op
     [SuppressMessage("Maintainability", "CA1508:Avoid dead conditional code", Justification = "False positive")]
     public K01BabSolution<T>? Solve()
     {
-        PrunablePriorityQueue<K01BabCandidate<T>, T> candidates = new(SortOrder.Maximum, static c => c.MaxGain);
+        DynamicPriorityQueue<K01BabCandidate<T>, T> candidates = new(SortOrder.Maximum, static c => c.MaxGain);
         K01BabCandidate<T> root = new(Bab: this, Selections: []);
         candidates.Enqueue(root);
         K01BabCandidate<T>? bestCandidate = null;

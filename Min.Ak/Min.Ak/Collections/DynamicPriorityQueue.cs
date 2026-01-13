@@ -5,17 +5,36 @@ using System.Text;
 namespace Min.Ak.Collections;
 
 [DebuggerDisplay("{ToString(),nq}")]
-internal sealed class PrunablePriorityQueue<TValue, TPriority>(SortOrder order, Func<TValue, TPriority> prioritySelector) where TPriority : unmanaged, INumber<TPriority>
+internal sealed class DynamicPriorityQueue<TValue, TPriority>(SortOrder order, Func<TValue, TPriority> prioritySelector)
+    where TValue : notnull
+    where TPriority : unmanaged, INumber<TPriority>
 {
-    private readonly List<Node> _nodes = [];
+    private readonly OrderedDictionary<TValue, Node> _nodes = [];
 
     public void Enqueue(TValue value)
     {
+        if (_nodes.ContainsKey(value))
+        {
+            throw new InvalidOperationException("Value is already present in the priority queue.");
+        }
         TPriority priority = prioritySelector(value);
         Node node = new(value, priority);
         int index = SearchIndex(priority);
-        _nodes.Insert(index, node);
+        _nodes.Insert(index, value, node);
     }
+
+    public bool TryRefresh(TValue value)
+    {
+        if (!_nodes.Remove(value, out Node node))
+        {
+            return false;
+        }
+        Debug.Assert(node.Value.Equals(value));
+        Enqueue(value);
+        return true;
+    }
+
+    public bool Contains(TValue value) => _nodes.ContainsKey(value);
 
     public TValue? Dequeue()
     {
@@ -23,7 +42,7 @@ internal sealed class PrunablePriorityQueue<TValue, TPriority>(SortOrder order, 
         {
             return default;
         }
-        TValue value = _nodes[0].Value;
+        TValue value = _nodes.GetAt(0).Value.Value;
         _nodes.RemoveAt(0);
         return value;
     }
@@ -50,7 +69,7 @@ internal sealed class PrunablePriorityQueue<TValue, TPriority>(SortOrder order, 
         while (lower < upper)
         {
             int pivot = lower + ((upper - lower) / 2);
-            TPriority pivotPriority = _nodes[pivot].Priority;
+            TPriority pivotPriority = _nodes.GetAt(pivot).Value.Priority;
 
             // Descending: higher priorities (may be numerically lower depending on order) come first.
             // If our priority is greater, we must go left (smaller index).
@@ -80,7 +99,7 @@ internal sealed class PrunablePriorityQueue<TValue, TPriority>(SortOrder order, 
         StringBuilder sb = new();
         sb.Append('[');
         bool isFirst = true;
-        foreach (Node node in _nodes)
+        foreach ((_, Node node) in _nodes)
         {
             if (isFirst)
             {
